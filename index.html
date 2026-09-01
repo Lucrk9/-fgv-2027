@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FGV 2027">
+<title>FGV 2027</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#f4f4f7;color:#111114;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif
+}
+.app{
+ max-width:760px;margin:auto;
+ padding:calc(env(safe-area-inset-top) + 8px) 16px
+ calc(100px + env(safe-area-inset-bottom))
+}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:16px 2px 12px
+}
+h1{font-size:31px;letter-spacing:-1.2px;margin:0}
+h2{font-size:21px;margin:0 0 12px}
+h3{font-size:16px;margin:0 0 7px}
+.muted{color:#777784;font-size:13px}
+.eyebrow{
+ text-transform:uppercase;letter-spacing:.08em;
+ font-size:11px;color:#777784;font-weight:800
+}
+.card{
+ background:#fff;border-radius:22px;padding:17px;margin:10px 0;
+ box-shadow:0 2px 18px #00000008
+}
+.hero{background:#101014;color:white;padding:20px}
+.hero .muted{color:#b9b9c1}
+.score{font-size:40px;font-weight:900;letter-spacing:-2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{padding:13px;border-radius:17px;background:#f5f5f7}
+.metric{font-size:26px;font-weight:900}
+.days{display:flex;gap:7px;overflow:auto;padding:4px 0 9px}
+.days button{
+ border:0;background:#e5e5ea;padding:10px 13px;
+ border-radius:12px;font-weight:800;white-space:nowrap
+}
+.days button.active{background:#111;color:#fff}
+.progress{
+ height:9px;background:#e7e7eb;border-radius:9px;overflow:hidden
+}
+.progress i{display:block;height:100%;width:0;background:#111}
+.task{
+ display:flex;gap:10px;align-items:center;
+ padding:12px 0;border-bottom:1px solid #e7e7eb
+}
+.task:last-child{border-bottom:0}
+.time{width:78px;font-size:12px;font-weight:800;color:#5f5f69}
+.taskbody{flex:1}
+.taskbody.done{text-decoration:line-through;opacity:.48}
+.check{width:24px;height:24px;accent-color:#111}
+.pill{
+ display:inline-block;padding:4px 7px;border-radius:7px;
+ background:#efeff4;font-size:10px;font-weight:800;margin-top:4px
+}
+.nav{
+ position:fixed;z-index:20;left:0;right:0;bottom:0;
+ padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+ background:#ffffffed;backdrop-filter:blur(20px);
+ border-top:1px solid #ddd;display:flex;
+ justify-content:center;gap:3px
+}
+.nav button{
+ border:0;background:transparent;border-radius:14px;
+ padding:8px 9px;font-size:11px;font-weight:800;color:#666
+}
+.nav button.active{background:#111;color:#fff}
+.screen{display:none}
+.screen.active{display:block}
+.primary{
+ border:0;border-radius:13px;background:#111;color:#fff;
+ padding:11px 14px;font-weight:800
+}
+.secondary{
+ border:1px solid #ddd;border-radius:13px;background:#fff;
+ padding:10px 13px;font-weight:800
+}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+input,textarea,select{
+ width:100%;border:1px solid #ddd;border-radius:13px;
+ padding:11px;background:#fff;outline:none;margin:4px 0
+}
+textarea{resize:vertical}
+.listrow{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:11px 0;border-bottom:1px solid #e7e7eb
+}
+.listrow:last-child{border:0}
+.timer{
+ text-align:center;font-size:64px;font-weight:900;
+ letter-spacing:-3px;padding:10px
+}
+.timer small{
+ display:block;font-size:12px;letter-spacing:0;color:#777784
+}
+.notice{
+ padding:12px;border-radius:14px;background:#f5f5f7;font-size:13px
+}
+.empty{color:#777784;font-size:13px;padding:8px 0}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+<div>
+<div class="eyebrow">Plano pessoal</div>
+<h1>FGV 2027</h1>
+<div class="muted" id="date"></div>
+</div>
+<div style="font-size:29px">🎯</div>
+</header>
+
+<section id="home" class="screen active">
+
+<div class="hero card">
+<div class="eyebrow" style="color:#aaa">Meta principal</div>
+<div class="score">FGV 2027</div>
+<div class="muted">Construir base agora • modo aprovação em 2027</div>
+
+<div style="margin-top:15px">
+<div style="display:flex;justify-content:space-between;font-size:12px">
+<b id="todayProgress"></b>
+<b id="todayPct"></b>
+</div>
+
+<div class="progress" style="background:#333;margin-top:7px">
+<i id="heroBar" style="background:#fff"></i>
+</div>
+</div>
+</div>
+
+<div class="days" id="days"></div>
+
+<div class="card">
+<div style="display:flex;justify-content:space-between">
+<h2 id="dayName"></h2>
+<span class="muted">rotina</span>
+</div>
+<div id="schedule"></div>
+</div>
+
+<div class="grid">
+
+<div class="mini">
+<div class="muted">SAT alvo</div>
+<div class="metric">1400+</div>
+<div class="muted">1300 = piso</div>
+</div>
+
+<div class="mini">
+<div class="muted">Redação</div>
+<div class="metric">2×/mês</div>
+<div class="muted">2026 • semanal em 2027</div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>🔥 Prioridade atual</h3>
+<p>Matemática + Inglês → depois Português → demais matérias.</p>
+<div class="notice">
+📵 Durante estudo: celular longe.
+</div>
+</div>
+
+</section>
+
+
+<section id="plan" class="screen">
+
+<div class="card">
+
+<h2>Plano 2026 → 2027</h2>
+
+<div class="listrow">
+<b>Set–Dez/2026</b>
+<span>Base</span>
+</div>
+
+<p class="muted">
+Matemática e inglês fortes; conhecer FGV/SAT; questões e diagnóstico.
+</p>
+
+<div class="listrow">
+<b>Jan–Jun/2027</b>
+<span>Competitividade</span>
+</div>
+
+<p class="muted">
+Cursinho + questões FGV + simulados + preparação específica SAT.
+</p>
+
+<div class="listrow">
+<b>Jul–Nov/2027</b>
+<span>Reta final</span>
+</div>
+
+<p class="muted">
+Provas completas, tempo, correção, erros, redação e SAT.
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>Metas</h2>
+
+<input id="goalInput"
+placeholder="Ex.: fazer 4 blocos de matemática">
+
+<button class="primary"
+style="margin-top:8px"
+onclick="addGoal()">
+Adicionar
+</button>
+
+<div id="goals"></div>
+
+</div>
+
+<div class="card">
+
+<h2>Checklist semanal</h2>
+
+<div class="listrow">
+<span>2–3 blocos de matemática</span>
+<span>☐</span>
+</div>
+
+<div class="listrow">
+<span>3 aulas de inglês</span>
+<span>☐</span>
+</div>
+
+<div class="listrow">
+<span>1 bloco FGV/SAT</span>
+<span>☐</span>
+</div>
+
+<div class="listrow">
+<span>Revisar erros</span>
+<span>☐</span>
+</div>
+
+<div class="listrow">
+<span>Redação quando for a semana</span>
+<span>☐</span>
+</div>
+
+</div>
+
+</section>
+
+
+<section id="progress" class="screen">
+
+<div class="card">
+
+<h2>Seu painel</h2>
+
+<div class="grid">
+
+<div class="mini">
+<div class="muted">Matemática</div>
+<div class="metric">5/10</div>
+</div>
+
+<div class="mini">
+<div class="muted">Inglês</div>
+<div class="metric">6/10</div>
+</div>
+
+<div class="mini">
+<div class="muted">Português</div>
+<div class="metric">6/10</div>
+</div>
+
+<div class="mini">
+<div class="muted">Geo/Bio</div>
+<div class="metric">9/10</div>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h2>Notas atuais</h2>
+<div id="subjects"></div>
+</div>
+
+<div class="card">
+
+<h2>Simulados</h2>
+
+<div id="sims"></div>
+
+<div class="row">
+<input id="simName" placeholder="Nome">
+<input id="simScore" type="number" placeholder="Nota">
+</div>
+
+<button class="primary"
+style="margin-top:8px"
+onclick="addSim()">
+Registrar
+</button>
+
+</div>
+
+</section>
+
+
+<section id="errors" class="screen">
+
+<div class="card">
+
+<h2>📝 Caderno de erros</h2>
+
+<div class="muted">
+Registre o erro, a causa e como evitar novamente.
+</div>
+
+<textarea id="errorInput"
+rows="4"
+placeholder="Ex.: Matemática — errei porcentagem porque...">
+</textarea>
+
+<button class="primary"
+onclick="addError()">
+Salvar erro
+</button>
+
+<div id="errorList"></div>
+
+</div>
+
+</section>
+
+
+<section id="focus" class="screen">
+
+<div class="card">
+
+<h2>⏱️ Modo foco</h2>
+
+<div class="timer" id="timer">
+25:00
+<small>FOCO</small>
+</div>
+
+<div class="row">
+
+<button class="primary"
+onclick="startTimer()">
+Iniciar
+</button>
+
+<button class="secondary"
+onclick="pauseTimer()">
+Pausar
+</button>
+
+<button class="secondary"
+onclick="resetTimer()">
+Resetar
+</button>
+
+</div>
+
+<p class="muted">
+25 minutos de foco → 5 minutos de pausa.
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>📵 Protocolo anti-celular</h2>
+
+<ol>
+<li>Deixe o iPhone longe.</li>
+<li>Ative Não Perturbe/Foco.</li>
+<li>Comece o cronômetro.</li>
+<li>Só pegue no intervalo.</li>
+</ol>
+
+</div>
+
+<div class="card">
+
+<h2>🧠 Método de estudo</h2>
+
+<p>1. Teoria curta</p>
+<p>2. Questões</p>
+<p>3. Correção</p>
+<p>4. Caderno de erros</p>
+<p>5. Revisão no domingo</p>
+
+</div>
+
+</section>
+
+
+<section id="redacao" class="screen">
+
+<div class="card">
+
+<h2>✍️ Redação</h2>
+
+<div class="notice">
+2026: uma a cada 2 semanas.<br>
+2027: uma por semana.
+</div>
+
+<br>
+
+<input id="essayDate" type="date">
+
+<input id="essayTheme"
+placeholder="Tema da redação">
+
+<select id="essayStatus">
+<option>Planejada</option>
+<option>Escrita</option>
+<option>Corrigida</option>
+<option>Reescrita</option>
+</select>
+
+<button class="primary"
+onclick="addEssay()">
+Adicionar
+</button>
+
+<div id="essays"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Checklist</h3>
+
+<p>☐ Tese clara</p>
+<p>☐ Argumentação</p>
+<p>☐ Coesão</p>
+<p>☐ Gramática</p>
+<p>☐ Conclusão</p>
+<p>☐ Reescrita dos erros</p>
+
+</div>
+
+</section>
+
+
+<nav class="nav">
+
+<button class="active"
+onclick="show('home',this)">
+Hoje
+</button>
+
+<button onclick="show('plan',this)">
+Plano
+</button>
+
+<button onclick="show('progress',this)">
+Progresso
+</button>
+
+<button onclick="show('errors',this)">
+Erros
+</button>
+
+<button onclick="show('focus',this)">
+Foco
+</button>
+
+<button onclick="show('redacao',this)">
+Redação
+</button>
+
+</nav>
+
+</div>
+
+
+<script>
+
+const schedule={
+
+Segunda:[
+["06:00","Acordar","Rotina"],
+["07:10–12:25","Escola","Escola"],
+["12:50–13:05","Almoço","Alimentação"],
+["13:35–14:35","Inglês — aula","Inglês"],
+["14:50–16:20","Matemática","Estudo"],
+["16:20–16:50","Lanche + descanso","Descanso"],
+["16:50–17:50","Português","Estudo"],
+["19:00–19:30","Jantar","Alimentação"],
+["19:30–20:30","Matemática — revisão","Estudo"],
+["20:30–22:00","Livre","Lazer"],
+["22:30","Dormir","Sono"]
+],
+
+Terça:[
+["06:00","Acordar","Rotina"],
+["07:10–12:25","Escola","Escola"],
+["12:50–13:05","Almoço","Alimentação"],
+["13:30–14:40","Matéria da prova de quarta","Escola"],
+["15:00–16:00","Fisioterapia","Saúde"],
+["16:45–17:15","Lanche","Alimentação"],
+["17:15–18:15","Revisão da prova","Estudo"],
+["18:45–19:45","Academia","Treino"],
+["20:15–20:40","Jantar","Alimentação"],
+["20:40–21:40","Última revisão","Estudo"],
+["22:30","Dormir","Sono"]
+],
+
+Quarta:[
+["06:00","Acordar","Rotina"],
+["07:10–12:25","Escola + prova","Escola"],
+["12:50–13:05","Almoço","Alimentação"],
+["13:45–14:45","Inglês — aula","Inglês"],
+["15:00–16:30","Matemática","Estudo"],
+["16:30–17:00","Lanche","Alimentação"],
+["17:00–18:00","Português","Estudo"],
+["19:00–19:30","Jantar","Alimentação"],
+["19:30–20:30","Química/Física","Estudo"],
+["20:30–22:00","Livre","Lazer"],
+["22:30","Dormir","Sono"]
+],
+
+Quinta:[
+["06:00","Acordar","Rotina"],
+["07:10–12:25","Escola","Escola"],
+["12:50–13:05","Almoço","Alimentação"],
+["13:30–14:40","Matemática","Estudo"],
+["15:00–16:00","Fisioterapia","Saúde"],
+["16:45–17:15","Lanche","Alimentação"],
+["17:15–18:15","História","Estudo"],
+["18:45–19:45","Academia","Treino"],
+["20:15–20:45","Jantar","Alimentação"],
+["20:45–21:45","Química/Física","Estudo"],
+["22:30","Dormir","Sono"]
+],
+
+Sexta:[
+["06:00","Acordar","Rotina"],
+["07:10–12:25","Escola","Escola"],
+["12:50–13:05","Almoço","Alimentação"],
+["13:45–14:45","Inglês — aula","Inglês"],
+["15:00–16:15","Matemática","Estudo"],
+["16:45–17:45","Geografia/Biologia","Manutenção"],
+["18:45–19:45","Academia","Treino"],
+["20:15–20:45","Jantar","Alimentação"],
+["20:45+","Livre","Lazer"]
+],
+
+Sábado:[
+["08:30","Acordar","Rotina"],
+["08:30–09:00","Café da manhã","Alimentação"],
+["09:00–12:30","Livre","Lazer"],
+["12:30–13:00","Almoço","Alimentação"],
+["13:00–14:00","Descanso","Descanso"],
+["14:00–15:30","Matemática","Estudo"],
+["15:50–17:00","Português","Estudo"],
+["17:30–18:30","FGV/SAT — questões","Vestibular"],
+["18:30+","Livre","Lazer"]
+],
+
+Domingo:[
+["08:30","Acordar","Rotina"],
+["09:00–10:30","Matemática","Estudo"],
+["10:30–10:50","Intervalo","Descanso"],
+["10:50–12:20","Matemática","Estudo"],
+["12:20–14:00","Almoço + descanso","Descanso"],
+["14:00–15:30","Português / Redação","Estudo"],
+["15:30–15:50","Intervalo","Descanso"],
+["15:50–17:20","História/Química/Física","Estudo"],
+["17:20–17:40","Intervalo","Descanso"],
+["17:40–18:30","Revisão semanal + erros","Revisão"],
+["18:30+","Livre","Lazer"]
+]
+
+};
+
+
+const days=Object.keys(schedule);
+
+let selected=days[(new Date().getDay()+6)%7];
+
+let data=JSON.parse(
+localStorage.fgvPro||'{}'
+);
+
+data.checks??={};
+data.goals??=[];
+data.errors??=[];
+data.sims??=[];
+data.essays??=[];
+
+
+date.textContent=
+new Date().toLocaleDateString(
+'pt-BR',
+{
+weekday:'long',
+day:'numeric',
+month:'long'
+});
+
+
+function save(){
+localStorage.fgvPro=JSON.stringify(data);
+}
+
+
+function render(){
+
+daysEl.innerHTML=days.map(d=>
+`<button class="${d===selected?'active':''}"
+onclick="selected='${d}';render()">
+${d.slice(0,3)}
+</button>`
+).join('');
+
+dayName.textContent=selected;
+
+scheduleEl=document.getElementById('schedule');
+
+scheduleEl.innerHTML=
+schedule[selected].map((x,i)=>{
+
+let k=selected+i;
+let ck=!!data.checks[k];
+
+return `
+<div class="task">
+
+<div class="time">
+${x[0]}
+</div>
+
+<div class="taskbody ${ck?'done':''}">
+<b>${x[1]}</b>
+<div>
+<span class="pill">${x[2]}</span>
+</div>
+</div>
+
+<input class="check"
+type="checkbox"
+${ck?'checked':''}
+onchange="
+data.checks['${k}']=this.checked;
+save();
+stats()
+">
+
+</div>`;
+
+}).join('');
+
+stats();
+
+}
+
+
+function stats(){
+
+let n=schedule[selected].length;
+
+let d=schedule[selected].reduce(
+(a,_,i)=>a+(data.checks[selected+i]?1:0),
+0
+);
+
+let p=Math.round(d/n*100);
+
+todayProgress.textContent=
+`${d}/${n} concluídos`;
+
+todayPct.textContent=
+p+'%';
+
+bar.style.width=p+'%';
+
+heroBar.style.width=p+'%';
+
+}
+
+
+function show(id,el){
+
+document.querySelectorAll('.screen')
+.forEach(s=>s.classList.remove('active'));
+
+document.getElementById(id)
+.classList.add('active');
+
+document.querySelectorAll('.nav button')
+.forEach(b=>b.classList.remove('active'));
+
+el.classList.add('active');
+
+if(id==='plan')renderPlan();
+if(id==='progress')renderProgress();
+if(id==='errors')renderErrors();
+if(id==='redacao')renderEssays();
+
+}
+
+
+function addGoal(){
+
+let v=goalInput.value.trim();
+
+if(!v)return;
+
+data.goals.push({
+text:v,
+done:false
+});
+
+goalInput.value='';
+
+save();
+
+renderPlan();
+
+}
+
+
+function renderPlan(){
+
+goals.innerHTML=
+data.goals.map((g,i)=>
+`
+<div class="listrow">
+
+<label>
+<input
+style="width:auto"
+type="checkbox"
+${g.done?'checked':''}
+onchange="
+data.goals[${i}].done=this.checked;
+save();
+renderPlan()
+">
+${g.text}
+</label>
+
+<button
+class="secondary"
+onclick="
+data.goals.splice(${i},1);
+save();
+renderPlan()
+">
+×
+</button>
+
+</div>
+`
+).join('')||
+'<div class="empty">Nenhuma meta adicionada.</div>';
+
+}
+
+
+const subj=[
+['Matemática',5],
+['Português',6],
+['Inglês',6],
+['História',5],
+['Química',5.5],
+['Física',6],
+['Geografia',9],
+['Biologia',9]
+];
+
+
+function renderProgress(){
+
+subjects.innerHTML=
+subj.map(s=>
+`
+<div style="margin:13px 0">
+
+<div style="display:flex;justify-content:space-between">
+<b>${s[0]}</b>
+<span>${s[1]}/10</span>
+</div>
+
+<div class="progress"
+style="margin-top:6px">
+
+<i style="width:${s[1]*10}%"></i>
+
+</div>
+
+</div>
+`
+).join('');
+
+sims.innerHTML=
+data.sims.map(s=>
+`
+<div class="listrow">
+
+<span>
+<b>${s.name}</b>
+<br>
+<span class="muted">${s.date}</span>
+</span>
+
+<b>${s.score}</b>
+
+</div>
+`
+).join('')||
+'<div class="empty">Nenhum simulado registrado.</div>';
+
+}
+
+
+function addSim(){
+
+let n=simName.value.trim();
+let s=simScore.value.trim();
+
+if(!n||!s)return;
+
+data.sims.unshift({
+name:n,
+score:s,
+date:new Date().toLocaleDateString('pt-BR')
+});
+
+save();
+
+simName.value='';
+simScore.value='';
+
+renderProgress();
+
+}
+
+
+function addError(){
+
+let v=errorInput.value.trim();
+
+if(!v)return;
+
+data.errors.unshift({
+text:v,
+date:new Date().toLocaleDateString('pt-BR')
+});
+
+save();
+
+errorInput.value='';
+
+renderErrors();
+
+}
+
+
+function renderErrors(){
+
+errorList.innerHTML=
+data.errors.map((e,i)=>
+`
+<div class="card"
+style="box-shadow:none;border:1px solid #e7e7eb;margin-top:9px">
+
+<div class="muted">${e.date}</div>
+
+<p>${e.text.replaceAll('<','&lt;')}</p>
+
+<button
+class="secondary"
+onclick="
+data.errors.splice(${i},1);
+save();
+renderErrors()
+">
+Excluir
+</button>
+
+</div>
+`
+).join('')||
+'<div class="empty">Seu caderno está vazio.</div>';
+
+}
+
+
+function addEssay(){
+
+let d=essayDate.value;
+let t=essayTheme.value.trim();
+let s=essayStatus.value;
+
+if(!d||!t)return;
+
+data.essays.unshift({
+date:d,
+theme:t,
+status:s
+});
+
+save();
+
+essayTheme.value='';
+
+renderEssays();
+
+}
+
+
+function renderEssays(){
+
+essays.innerHTML=
+data.essays.map((e,i)=>
+`
+<div class="listrow">
+
+<span>
+<b>${e.theme}</b>
+<br>
+<span class="muted">${e.date}</span>
+</span>
+
+<select
+style="width:130px"
+onchange="
+data.essays[${i}].status=this.value;
+save()
+">
+
+<option ${e.status==='Planejada'?'selected':''}>
+Planejada
+</option>
+
+<option ${e.status==='Escrita'?'selected':''}>
+Escrita
+</option>
+
+<option ${e.status==='Corrigida'?'selected':''}>
+Corrigida
+</option>
+
+<option ${e.status==='Reescrita'?'selected':''}>
+Reescrita
+</option>
+
+</select>
+
+</div>
+`
+).join('')||
+'<div class="empty">Nenhuma redação cadastrada.</div>';
+
+}
+
+
+let seconds=1500;
+let timerInt=null;
+let mode='FOCO';
+
+
+function drawTimer(){
+
+let m=String(
+Math.floor(seconds/60)
+).padStart(2,'0');
+
+let s=String(
+seconds%60
+).padStart(2,'0');
+
+timer.innerHTML=
+`${m}:${s}<small>${mode}</small>`;
+
+}
+
+
+function startTimer(){
+
+if(timerInt)return;
+
+timerInt=setInterval(()=>{
+
+seconds--;
+
+drawTimer();
+
+if(seconds<=0){
+
+clearInterval(timerInt);
+timerInt=null;
+
+if(mode==='FOCO'){
+mode='PAUSA';
+seconds=300;
+}else{
+mode='FOCO';
+seconds=1500;
+}
+
+drawTimer();
+
+alert(
+mode==='PAUSA'
+?'Bloco concluído. Faça 5 minutos de pausa.'
+:'Pausa concluída. Volte ao foco!'
+);
+
+}
+
+},1000);
+
+}
+
+
+function pauseTimer(){
+
+clearInterval(timerInt);
+timerInt=null;
+
+}
+
+
+function resetTimer(){
+
+pauseTimer();
+
+mode='FOCO';
+seconds=1500;
+
+drawTimer();
+
+}
+
+
+render();
+renderPlan();
+renderProgress();
+renderErrors();
+renderEssays();
+drawTimer();
+
+</script>
+
+</body>
+</html>
